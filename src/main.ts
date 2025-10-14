@@ -84,6 +84,48 @@ async function menuGerarRelatorio() {
   console.log('Relatório gerado em', file);
 }
 
+async function menuCadastrarPeca() {
+  if (!currentUser) { console.log('Autentique-se primeiro'); return; }
+  if (![NivelPermissao.ADMINISTRADOR, NivelPermissao.ENGENHEIRO].includes(currentUser.nivelPermissao)) { console.log('Apenas ADMIN/ENGENHEIRO podem cadastrar peças'); return; }
+  const answers = await inquirer.prompt([
+    { name: 'codigo', message: 'Código aeronave (associar a peça):', type: 'input', validate: (v:any) => v?true:'Informe código' },
+    { name: 'nome', message: 'Nome da peça:', type: 'input', validate: (v:any) => v?true:'Informe nome' },
+    { name: 'tipo', message: 'Tipo da peça:', type: 'list', choices: Object.values(TipoPeca) },
+    { name: 'fornecedor', message: 'Fornecedor:', type: 'input' }
+  ] as any);
+  const p = new (await import('./classes/models')).Peca(answers.nome, answers.tipo as any, answers.fornecedor, undefined as any);
+  // default status será EM_PRODUCAO
+  p.status = (await import('./enums')).StatusPeca.EM_PRODUCAO;
+  try { prod.adicionarPeca(answers.codigo, p); console.log('✅ Peça adicionada com sucesso.'); }
+  catch (e:any) { console.log('Erro ao adicionar peça:', e.message || e); }
+}
+
+async function menuCadastrarEtapa() {
+  if (!currentUser) { console.log('Autentique-se primeiro'); return; }
+  if (![NivelPermissao.ADMINISTRADOR, NivelPermissao.ENGENHEIRO].includes(currentUser.nivelPermissao)) { console.log('Apenas ADMIN/ENGENHEIRO podem cadastrar etapas'); return; }
+  const answers = await inquirer.prompt([
+    { name: 'codigo', message: 'Código aeronave (associar a etapa):', type: 'input', validate: (v:any) => v?true:'Informe código' },
+    { name: 'nome', message: 'Nome da etapa:', type: 'input', validate: (v:any) => v?true:'Informe nome' },
+    { name: 'prazo', message: 'Prazo (dias):', type: 'input', validate: (v:any) => !isNaN(parseInt(v)) || 'Informe número' }
+  ] as any);
+  const e = new (await import('./classes/models')).Etapa(answers.nome, parseInt(answers.prazo), undefined as any);
+  try { prod.adicionarEtapa(answers.codigo, e); console.log('✅ Etapa adicionada com sucesso.'); }
+  catch (e:any) { console.log('Erro ao adicionar etapa:', e.message || e); }
+}
+
+async function menuRegistrarTeste() {
+  if (!currentUser) { console.log('Autentique-se primeiro'); return; }
+  if (![NivelPermissao.ADMINISTRADOR, NivelPermissao.ENGENHEIRO, NivelPermissao.OPERADOR].includes(currentUser.nivelPermissao)) { console.log('Permissão negada para registrar testes'); return; }
+  const answers = await inquirer.prompt([
+    { name: 'codigo', message: 'Código aeronave:', type: 'input', validate: (v:any) => v?true:'Informe código' },
+    { name: 'tipoTeste', message: 'Tipo teste:', type: 'list', choices: Object.values(TipoTeste) },
+    { name: 'resultado', message: 'Resultado:', type: 'list', choices: Object.values(ResultadoTeste) }
+  ] as any);
+  const t = new (await import('./classes/models')).Teste(answers.tipoTeste as any, answers.resultado as any);
+  try { prod.registrarTeste(answers.codigo, t); console.log('✅ Teste registrado com sucesso.'); }
+  catch (e:any) { console.log('Erro ao registrar teste:', e.message || e); }
+}
+
 async function menuGerenciarFuncionarios() {
   if (!currentUser) { console.log('Autentique-se primeiro'); return; }
   if (currentUser.nivelPermissao !== NivelPermissao.ADMINISTRADOR) { console.log('Apenas administradores podem gerenciar funcionários'); return; }
@@ -168,6 +210,15 @@ async function mainMenu() {
       if (currentUser.nivelPermissao === NivelPermissao.ADMINISTRADOR) {
         choices.push({ name: 'Gerenciar Funcionários', value: 'gerenciar-funcionarios' });
       }
+      // Cadastrar peça/etapa visível para ADMIN/ENGENHEIRO
+      if ([NivelPermissao.ADMINISTRADOR, NivelPermissao.ENGENHEIRO].includes(currentUser.nivelPermissao)) {
+        choices.push({ name: 'Cadastrar Peça', value: 'cadastrar-peca' });
+        choices.push({ name: 'Cadastrar Etapa', value: 'cadastrar-etapa' });
+      }
+      // Registrar teste visível para ADMIN/ENGENHEIRO/OPERADOR
+      if ([NivelPermissao.ADMINISTRADOR, NivelPermissao.ENGENHEIRO, NivelPermissao.OPERADOR].includes(currentUser.nivelPermissao)) {
+        choices.push({ name: 'Registrar Teste', value: 'registrar-teste' });
+      }
       choices.push({ name: 'Cadastrar Aeronave', value: 'cadastrar-aeronave' });
       choices.push({ name: 'Listar Etapas', value: 'listar-etapas' });
       choices.push({ name: 'Atualizar Status (peça/etapa/teste)', value: 'atualizar-status' });
@@ -179,11 +230,14 @@ async function mainMenu() {
     try {
       if (cmd === 'login') await menuLogin();
       else if (cmd === 'logout') { currentUser = null; console.log('Você saiu da sessão.'); }
-      else if (cmd === 'gerenciar-funcionarios') await menuGerenciarFuncionarios();
-      else if (cmd === 'cadastrar-aeronave') await menuCadastrarAeronave();
-      else if (cmd === 'listar-etapas') await menuListarEtapas();
-      else if (cmd === 'atualizar-status') await menuAtualizarStatus();
-      else if (cmd === 'gerar-relatorio') await menuGerarRelatorio();
+  else if (cmd === 'gerenciar-funcionarios') await menuGerenciarFuncionarios();
+  else if (cmd === 'cadastrar-peca') await menuCadastrarPeca();
+  else if (cmd === 'cadastrar-etapa') await menuCadastrarEtapa();
+  else if (cmd === 'registrar-teste') await menuRegistrarTeste();
+  else if (cmd === 'cadastrar-aeronave') await menuCadastrarAeronave();
+  else if (cmd === 'listar-etapas') await menuListarEtapas();
+  else if (cmd === 'atualizar-status') await menuAtualizarStatus();
+  else if (cmd === 'gerar-relatorio') await menuGerarRelatorio();
       else if (cmd === 'sair') { console.log('Encerrando...'); break; }
     } catch (e: any) { console.log('Erro:', e.message || e); }
   }
