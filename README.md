@@ -14,6 +14,7 @@ O projeto possui duas interfaces:
 git clone https://github.com/jofran2001/Atv2.git
 cd Atv2
 ```
+## Após clonar, abra outro terminal no mesmo diretório que clonou
 
 ### Instalar dependências
 
