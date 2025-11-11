@@ -4,12 +4,14 @@
     "module": "CommonJS",
     "moduleResolution": "Node",
     "outDir": "dist",
-    // "rootDir": "src",
+    "rootDir": "backend",
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "lib": ["ES2020"]
-  }
+  },
+  "include": ["backend/**/*"],
+  "exclude": ["node_modules", "frontend"]
 }

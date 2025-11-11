@@ -9,25 +9,23 @@ O projeto possui duas interfaces:
 - **GUI Web**: Interface web moderna com React, TypeScript e Vite
 
 ## Instalação
-## Clone o repositório
+### Clone o repositório
 ```bash
 git clone https://github.com/jofran2001/Atv2.git
+cd Atv2
 ```
 
-### Instalação Completa
+### Instalar dependências
 
-1. No diretório raiz, instale as dependências do backend:
-
+Backend (raiz do projeto):
 ```bash
 npm install
 ```
 
-2. No diretório frontend, instale as dependências do frontend:
-
+Frontend (dentro da pasta `frontend`):
 ```bash
 cd frontend
 npm install
-cd ..
 ```
 
 ## Execução
@@ -36,7 +34,7 @@ cd ..
 
 Para usar a interface web:
 
-1. **Terminal 1** - Inicie o servidor backend:
+1. **Terminal 1** - Inicie o servidor backend (na raiz do projeto):
 ```bash
 npm run server
 ```
@@ -44,6 +42,7 @@ npm run server
 2. **Terminal 2** - Inicie o frontend:
 ```bash
 cd frontend
+npm i
 npm run dev
 ```
 
@@ -146,8 +145,8 @@ TIMESTAMP | action:ACTION | actor:ACTOR_ID | target:TARGET_ID | usuario:USERNAME
 ## Estrutura do Projeto
 
 ```
-TP1/
-├── src/                      # Backend
+Atv2/
+├── backend/                  # Backend (antes era src/)
 │   ├── auth/                 # Serviço de autenticação
 │   ├── classes/              # Modelos de dados
 │   ├── enums/                # Enumerações
@@ -170,7 +169,7 @@ TP1/
 
 ### Via Web (GUI)
 
-1. Inicie o servidor: `npm run server`
+1. Inicie o servidor (raiz): `npm run server`
 2. Inicie o frontend: `cd frontend && npm run dev`
 3. Acesse: `http://localhost:5173`
 4. Faça login com `admin / admin123`
@@ -178,7 +177,7 @@ TP1/
 
 ### Via CLI
 
-1. Execute: `npm run dev`
+1. Execute (raiz): `npm run dev`
 2. Selecione "Login" e entre com `admin / admin123`
 3. Navegue pelo menu interativo
 

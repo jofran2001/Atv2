@@ -6,8 +6,8 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/main.js",
-    "dev": "ts-node src/main.ts",
-    "server": "ts-node src/server.ts"
+    "dev": "ts-node backend/main.ts",
+    "server": "ts-node backend/server.ts"
   },
   "keywords": [],
   "author": "aerocode",
